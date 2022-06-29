@@ -42,11 +42,6 @@ const App: React.FC = () => {
   const [selectedPoints, setSelectedPoints] = useState([] as VirtualPoint[]);
   const [mode, setMode] = useState("none");
 
-  useEffect(() => {
-    setLines(lines.slice(0, -1).concat({ points: selectedPoints, key: `line_${lines.length}`, color: "black" }));
-    setSelectedPoints([]);
-  }, [mode]);
-
   const onWheel = (e: any) => {
     e.preventDefault();
 
@@ -63,8 +58,6 @@ const App: React.FC = () => {
 
       setPitch(new_pitch);
       setUpperLeft(add(upperLeft, sub(raw_vpos, new_raw_vpos)));
-    } else if (e.shiftKey) {
-      setUpperLeft(add(upperLeft, toVirtualGrid({ x: e.deltaY, y: e.deltaX }, pitch, { vx: 0, vy: 0 })));
     } else {
       setUpperLeft(add(upperLeft, toVirtualGrid({ x: e.deltaX, y: e.deltaY }, pitch, { vx: 0, vy: 0 })));
     }
@@ -82,12 +75,13 @@ const App: React.FC = () => {
 
   return (
     <div ref={divRef} tabIndex={1} onKeyDown={e => {
+      let next_mode = mode;
       switch (e.code) {
         case 'Escape':
-          setMode("none");
+          next_mode = "none";
           break;
         case 'KeyL':
-          setMode("line");
+          next_mode = "line";
           break;
         case 'KeyE':
           setPitch(pitch + 1);
@@ -97,6 +91,11 @@ const App: React.FC = () => {
           break;
         default:
       }
+      if (mode === "line" && next_mode !== mode && selectedPoints.length > 0) {
+        setLines(lines.slice(0, -1).concat({ points: selectedPoints, key: `line_${lines.length}`, color: "black" }));
+        setSelectedPoints([]);
+      }
+      setMode(next_mode);
     }} style={{ cursor: modeToCursorStyle(mode) }}>
       <Stage width={width} height={height} onClick={e => {
         switch (mode) {
@@ -107,6 +106,8 @@ const App: React.FC = () => {
             let newSelectedPoints = [...selectedPoints, vpos];
             if (selectedPoints.length) {
               setLines(lines.slice(0, -1).concat({ points: newSelectedPoints, key: `line_${lines.length}`, color: "black" }));
+            } else {
+              setLines(lines.concat({ points: newSelectedPoints, key: `line_${lines.length + 1}`, color: "black" }));
             }
 
             setSelectedPoints(newSelectedPoints);
