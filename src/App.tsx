@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Stage, Layer, Line } from 'react-konva';
+import { Stage, Layer, Line, Group, Circle, Arc } from 'react-konva';
 import './App.css';
+import Cell from './components/Cell';
 import { HorizontalGrids, VerticalGrids } from './Grid';
 import { add, RealPoint, sub, toFixedVirtualGrid, toRealGrid, toVirtualGrid, VirtualPoint } from './helpers/gridhelper';
 import { useWindowSize } from './useWindowSize';
@@ -37,7 +38,7 @@ const App: React.FC = () => {
   const { height, width } = useWindowSize();
 
   const [pitch, setPitch] = useState(20);
-  const [upperLeft, setUpperLeft] = useState({ vx: 0, vy: 0 });
+  const [upperLeft, setUpperLeft] = useState({ vx: 0, vy: 0 } as VirtualPoint);
   const [lines, setLines] = useState([] as LineState[]);
   const [selectedPoints, setSelectedPoints] = useState([] as VirtualPoint[]);
   const [mode, setMode] = useState("none");
@@ -74,65 +75,70 @@ const App: React.FC = () => {
   });
 
   return (
-    <div ref={divRef} tabIndex={1} onKeyDown={e => {
-      let next_mode = mode;
-      switch (e.code) {
-        case 'Escape':
-          next_mode = "none";
-          break;
-        case 'KeyL':
-          next_mode = "line";
-          break;
-        case 'KeyE':
-          setPitch(pitch + 1);
-          break;
-        case 'KeyR':
-          setPitch(pitch - 1);
-          break;
-        default:
-      }
-      if (mode === "line" && next_mode !== mode && selectedPoints.length > 0) {
-        setLines(lines.slice(0, -1).concat({ points: selectedPoints, key: `line_${lines.length}`, color: "black" }));
-        setSelectedPoints([]);
-      }
-      setMode(next_mode);
-    }} style={{ cursor: modeToCursorStyle(mode) }}>
-      <Stage width={width} height={height} onClick={e => {
-        switch (mode) {
-          case "line":
-            let pos = e.target.getRelativePointerPosition();
-            let vpos = toFixedVirtualGrid(pos, pitch, upperLeft);
+    <React.StrictMode>
 
-            let newSelectedPoints = [...selectedPoints, vpos];
-            if (selectedPoints.length) {
+      <div ref={divRef} tabIndex={1} onKeyDown={e => {
+        let next_mode = mode;
+        switch (e.code) {
+          case 'Escape':
+            next_mode = "none";
+            break;
+          case 'KeyL':
+            next_mode = "line";
+            break;
+          case 'KeyE':
+            setPitch(pitch + 1);
+            break;
+          case 'KeyR':
+            setPitch(pitch - 1);
+            break;
+          default:
+        }
+        if (mode === "line" && next_mode !== mode && selectedPoints.length > 0) {
+          setLines(lines.slice(0, -1).concat({ points: selectedPoints, key: `line_${lines.length}`, color: "black" }));
+          setSelectedPoints([]);
+        }
+        setMode(next_mode);
+      }} style={{ cursor: modeToCursorStyle(mode) }}>
+        <Stage width={width} height={height} onClick={e => {
+          switch (mode) {
+            case "line":
+              let pos = e.target.getRelativePointerPosition();
+              let vpos = toFixedVirtualGrid(pos, pitch, upperLeft);
+
+              let newSelectedPoints = [...selectedPoints, vpos];
+              if (selectedPoints.length) {
+                setLines(lines.slice(0, -1).concat({ points: newSelectedPoints, key: `line_${lines.length}`, color: "black" }));
+              } else {
+                setLines(lines.concat({ points: newSelectedPoints, key: `line_${lines.length + 1}`, color: "black" }));
+              }
+
+              setSelectedPoints(newSelectedPoints);
+              break;
+            default:
+          }
+        }} onMouseMove={e => {
+          console.log(e.target.getRelativePointerPosition());
+          switch (mode) {
+            case "line":
+              if (!selectedPoints.length) break;
+
+              let vpos = toFixedVirtualGrid(e.target.getRelativePointerPosition(), pitch, upperLeft);
+              let newSelectedPoints = [...selectedPoints, vpos];
               setLines(lines.slice(0, -1).concat({ points: newSelectedPoints, key: `line_${lines.length}`, color: "black" }));
-            } else {
-              setLines(lines.concat({ points: newSelectedPoints, key: `line_${lines.length + 1}`, color: "black" }));
-            }
-
-            setSelectedPoints(newSelectedPoints);
-            break;
-          default:
-        }
-      }} onMouseMove={e => {
-        switch (mode) {
-          case "line":
-            if (!selectedPoints.length) break;
-
-            let vpos = toFixedVirtualGrid(e.target.getRelativePointerPosition(), pitch, upperLeft);
-            let newSelectedPoints = [...selectedPoints, vpos];
-            setLines(lines.slice(0, -1).concat({ points: newSelectedPoints, key: `line_${lines.length}`, color: "black" }));
-            break;
-          default:
-        }
-      }}>
-        <Layer>
-          {VerticalGrids(pitch, width, height, upperLeft.vx)}
-          {HorizontalGrids(pitch, width, height, upperLeft.vy)}
-          {lines.map(l => createLine(l, pitch, upperLeft))}
-        </Layer>
-      </Stage>
-    </div >
+              break;
+            default:
+          }
+        }}>
+          <Layer>
+            {VerticalGrids(pitch, width, height, upperLeft.vx)}
+            {HorizontalGrids(pitch, width, height, upperLeft.vy)}
+            {lines.map(l => createLine(l, pitch, upperLeft))}
+            <Cell upperLeft={upperLeft} pitch={pitch} point={{ vx: 20, vy: 20 }}></Cell>
+          </Layer>
+        </Stage>
+      </div >
+    </React.StrictMode>
   );
 }
 
