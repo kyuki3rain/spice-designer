@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Line } from 'react-konva';
 import './App.css';
 import { HorizontalGrids, VerticalGrids } from './Grid';
-import { add, fix, RealPoint, sub, toFixedVirtualGrid, toRealGrid, toVirtualGrid, VirtualPoint } from './helpers/gridhelper';
+import { add, RealPoint, sub, toFixedVirtualGrid, toRealGrid, toVirtualGrid, VirtualPoint } from './helpers/gridhelper';
 import { useWindowSize } from './useWindowSize';
 
 type LineState = {
