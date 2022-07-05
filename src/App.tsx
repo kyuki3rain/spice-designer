@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Stage, Layer, Line, Group, Circle, Arc } from 'react-konva';
+import React, { ComponentState, useEffect, useRef, useState } from 'react';
+import { Stage, Layer, Line } from 'react-konva';
 import './App.css';
-import Cell from './components/Cell';
+import { createComponent } from './components';
 import { HorizontalGrids, VerticalGrids } from './Grid';
 import { add, RealPoint, sub, toFixedVirtualGrid, toRealGrid, toVirtualGrid, VirtualPoint } from './helpers/gridhelper';
 import { useWindowSize } from './useWindowSize';
@@ -40,6 +40,7 @@ const App: React.FC = () => {
   const [pitch, setPitch] = useState(20);
   const [upperLeft, setUpperLeft] = useState({ vx: 0, vy: 0 } as VirtualPoint);
   const [lines, setLines] = useState([] as LineState[]);
+  const [components, setComponents] = useState([] as ComponentState[]);
   const [selectedPoints, setSelectedPoints] = useState([] as VirtualPoint[]);
   const [mode, setMode] = useState("none");
 
@@ -76,7 +77,6 @@ const App: React.FC = () => {
 
   return (
     <React.StrictMode>
-
       <div ref={divRef} tabIndex={1} onKeyDown={e => {
         let next_mode = mode;
         switch (e.code) {
@@ -85,6 +85,11 @@ const App: React.FC = () => {
             break;
           case 'KeyL':
             next_mode = "line";
+            break;
+          case 'KeyP':
+            next_mode = "component";
+            console.log("aaaa");
+            setComponents(components.concat({ type: "cell", point: { vx: 0, vy: 0 } }));
             break;
           case 'KeyE':
             setPitch(pitch + 1);
@@ -98,14 +103,20 @@ const App: React.FC = () => {
           setLines(lines.slice(0, -1).concat({ points: selectedPoints, key: `line_${lines.length}`, color: "black" }));
           setSelectedPoints([]);
         }
+        if (mode === "component" && next_mode !== mode) {
+          setComponents(components.slice(0, -1));
+        }
         setMode(next_mode);
       }} style={{ cursor: modeToCursorStyle(mode) }}>
         <Stage width={width} height={height} onClick={e => {
+          let stage = e.target.getStage();
+          if (!stage) return;
+          let pos = stage.getPointerPosition();
+          if (!pos) return;
+
+          let vpos = toFixedVirtualGrid(pos, pitch, upperLeft);
           switch (mode) {
             case "line":
-              let pos = e.target.getRelativePointerPosition();
-              let vpos = toFixedVirtualGrid(pos, pitch, upperLeft);
-
               let newSelectedPoints = [...selectedPoints, vpos];
               if (selectedPoints.length) {
                 setLines(lines.slice(0, -1).concat({ points: newSelectedPoints, key: `line_${lines.length}`, color: "black" }));
@@ -115,17 +126,28 @@ const App: React.FC = () => {
 
               setSelectedPoints(newSelectedPoints);
               break;
+            case "component":
+              console.log(vpos);
+              setComponents(components.slice(0, -1).concat({ type: "cell", point: vpos }).concat({ type: "cell", point: vpos }));
+              break;
             default:
           }
         }} onMouseMove={e => {
-          console.log(e.target.getRelativePointerPosition());
+          let stage = e.target.getStage();
+          if (!stage) return;
+          let pos = stage.getPointerPosition();
+          if (!pos) return;
+
+          let vpos = toFixedVirtualGrid(pos, pitch, upperLeft);
           switch (mode) {
             case "line":
               if (!selectedPoints.length) break;
 
-              let vpos = toFixedVirtualGrid(e.target.getRelativePointerPosition(), pitch, upperLeft);
               let newSelectedPoints = [...selectedPoints, vpos];
               setLines(lines.slice(0, -1).concat({ points: newSelectedPoints, key: `line_${lines.length}`, color: "black" }));
+              break;
+            case "component":
+              setComponents(components.slice(0, -1).concat({ type: "cell", point: vpos }));
               break;
             default:
           }
@@ -134,10 +156,10 @@ const App: React.FC = () => {
             {VerticalGrids(pitch, width, height, upperLeft.vx)}
             {HorizontalGrids(pitch, width, height, upperLeft.vy)}
             {lines.map(l => createLine(l, pitch, upperLeft))}
-            <Cell upperLeft={upperLeft} pitch={pitch} point={{ vx: 20, vy: 20 }}></Cell>
+            {components.map((c, i) => createComponent(c, pitch, upperLeft, `components_${i}_${c.type}`))}
           </Layer>
         </Stage>
-      </div >
+      </div>
     </React.StrictMode>
   );
 }
