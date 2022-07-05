@@ -1,7 +1,7 @@
 import React, { ComponentState, useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Line } from 'react-konva';
 import './App.css';
-import { createComponent } from './components';
+import { ComponentType, ComponentTypes, createComponent, nextType } from './components';
 import { HorizontalGrids, VerticalGrids } from './Grid';
 import { add, RealPoint, sub, toFixedVirtualGrid, toRealGrid, toVirtualGrid, VirtualPoint } from './helpers/gridhelper';
 import { useWindowSize } from './useWindowSize';
@@ -43,6 +43,7 @@ const App: React.FC = () => {
   const [components, setComponents] = useState([] as ComponentState[]);
   const [selectedPoints, setSelectedPoints] = useState([] as VirtualPoint[]);
   const [mode, setMode] = useState("none");
+  const [componentType, setComponentType] = useState(ComponentTypes.CELL as ComponentType);
 
   const onWheel = (e: any) => {
     e.preventDefault();
@@ -88,8 +89,11 @@ const App: React.FC = () => {
             break;
           case 'KeyP':
             next_mode = "component";
-            console.log("aaaa");
-            setComponents(components.concat({ type: "cell", point: { vx: 0, vy: 0 } }));
+            if (mode != next_mode) {
+              setComponents(components.concat({ type: componentType, point: { vx: 0, vy: 0 } }));
+            } else {
+              setComponentType(nextType(componentType));
+            }
             break;
           case 'KeyE':
             setPitch(pitch + 1);
@@ -127,8 +131,7 @@ const App: React.FC = () => {
               setSelectedPoints(newSelectedPoints);
               break;
             case "component":
-              console.log(vpos);
-              setComponents(components.slice(0, -1).concat({ type: "cell", point: vpos }).concat({ type: "cell", point: vpos }));
+              setComponents(components.slice(0, -1).concat({ type: componentType, point: vpos }).concat({ type: componentType, point: vpos }));
               break;
             default:
           }
@@ -147,7 +150,7 @@ const App: React.FC = () => {
               setLines(lines.slice(0, -1).concat({ points: newSelectedPoints, key: `line_${lines.length}`, color: "black" }));
               break;
             case "component":
-              setComponents(components.slice(0, -1).concat({ type: "cell", point: vpos }));
+              setComponents(components.slice(0, -1).concat({ type: componentType, point: vpos }));
               break;
             default:
           }
