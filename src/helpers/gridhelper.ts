@@ -1,5 +1,7 @@
+import { Vector2d } from "konva/lib/types";
+
 export type VirtualPoint = { vx: number, vy: number };
-export type RealPoint = { x: number, y: number };
+export type RealPoint = Vector2d;
 
 export const toFixedVirtualGrid = (point: RealPoint, pitch: number, upperLeft: VirtualPoint) => {
     return fix(toVirtualGrid(point, pitch, upperLeft));

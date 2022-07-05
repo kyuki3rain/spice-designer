@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { ComponentState, useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Line } from 'react-konva';
 import './App.css';
+import { ComponentType, ComponentTypes, createComponent, nextType } from './components';
 import { HorizontalGrids, VerticalGrids } from './Grid';
-import { add, fix, RealPoint, sub, toFixedVirtualGrid, toRealGrid, toVirtualGrid, VirtualPoint } from './helpers/gridhelper';
+import { add, RealPoint, sub, toFixedVirtualGrid, toRealGrid, toVirtualGrid, VirtualPoint } from './helpers/gridhelper';
 import { useWindowSize } from './useWindowSize';
 
 type LineState = {
@@ -37,10 +38,12 @@ const App: React.FC = () => {
   const { height, width } = useWindowSize();
 
   const [pitch, setPitch] = useState(20);
-  const [upperLeft, setUpperLeft] = useState({ vx: 0, vy: 0 });
+  const [upperLeft, setUpperLeft] = useState({ vx: 0, vy: 0 } as VirtualPoint);
   const [lines, setLines] = useState([] as LineState[]);
+  const [components, setComponents] = useState([] as ComponentState[]);
   const [selectedPoints, setSelectedPoints] = useState([] as VirtualPoint[]);
   const [mode, setMode] = useState("none");
+  const [componentType, setComponentType] = useState(ComponentTypes.CELL as ComponentType);
 
   const onWheel = (e: any) => {
     e.preventDefault();
@@ -74,65 +77,93 @@ const App: React.FC = () => {
   });
 
   return (
-    <div ref={divRef} tabIndex={1} onKeyDown={e => {
-      let next_mode = mode;
-      switch (e.code) {
-        case 'Escape':
-          next_mode = "none";
-          break;
-        case 'KeyL':
-          next_mode = "line";
-          break;
-        case 'KeyE':
-          setPitch(pitch + 1);
-          break;
-        case 'KeyR':
-          setPitch(pitch - 1);
-          break;
-        default:
-      }
-      if (mode === "line" && next_mode !== mode && selectedPoints.length > 0) {
-        setLines(lines.slice(0, -1).concat({ points: selectedPoints, key: `line_${lines.length}`, color: "black" }));
-        setSelectedPoints([]);
-      }
-      setMode(next_mode);
-    }} style={{ cursor: modeToCursorStyle(mode) }}>
-      <Stage width={width} height={height} onClick={e => {
-        switch (mode) {
-          case "line":
-            let pos = e.target.getRelativePointerPosition();
-            let vpos = toFixedVirtualGrid(pos, pitch, upperLeft);
-
-            let newSelectedPoints = [...selectedPoints, vpos];
-            if (selectedPoints.length) {
-              setLines(lines.slice(0, -1).concat({ points: newSelectedPoints, key: `line_${lines.length}`, color: "black" }));
+    <React.StrictMode>
+      <div ref={divRef} tabIndex={1} onKeyDown={e => {
+        let next_mode = mode;
+        switch (e.code) {
+          case 'Escape':
+            next_mode = "none";
+            break;
+          case 'KeyL':
+            next_mode = "line";
+            break;
+          case 'KeyP':
+            next_mode = "component";
+            if (mode != next_mode) {
+              setComponents(components.concat({ type: componentType, point: { vx: 0, vy: 0 } }));
             } else {
-              setLines(lines.concat({ points: newSelectedPoints, key: `line_${lines.length + 1}`, color: "black" }));
+              setComponentType(nextType(componentType));
             }
-
-            setSelectedPoints(newSelectedPoints);
+            break;
+          case 'KeyE':
+            setPitch(pitch + 1);
+            break;
+          case 'KeyR':
+            setPitch(pitch - 1);
             break;
           default:
         }
-      }} onMouseMove={e => {
-        switch (mode) {
-          case "line":
-            if (!selectedPoints.length) break;
-
-            let vpos = toFixedVirtualGrid(e.target.getRelativePointerPosition(), pitch, upperLeft);
-            let newSelectedPoints = [...selectedPoints, vpos];
-            setLines(lines.slice(0, -1).concat({ points: newSelectedPoints, key: `line_${lines.length}`, color: "black" }));
-            break;
-          default:
+        if (mode === "line" && next_mode !== mode && selectedPoints.length > 0) {
+          setLines(lines.slice(0, -1).concat({ points: selectedPoints, key: `line_${lines.length}`, color: "black" }));
+          setSelectedPoints([]);
         }
-      }}>
-        <Layer>
-          {VerticalGrids(pitch, width, height, upperLeft.vx)}
-          {HorizontalGrids(pitch, width, height, upperLeft.vy)}
-          {lines.map(l => createLine(l, pitch, upperLeft))}
-        </Layer>
-      </Stage>
-    </div >
+        if (mode === "component" && next_mode !== mode) {
+          setComponents(components.slice(0, -1));
+        }
+        setMode(next_mode);
+      }} style={{ cursor: modeToCursorStyle(mode) }}>
+        <Stage width={width} height={height} onClick={e => {
+          let stage = e.target.getStage();
+          if (!stage) return;
+          let pos = stage.getPointerPosition();
+          if (!pos) return;
+
+          let vpos = toFixedVirtualGrid(pos, pitch, upperLeft);
+          switch (mode) {
+            case "line":
+              let newSelectedPoints = [...selectedPoints, vpos];
+              if (selectedPoints.length) {
+                setLines(lines.slice(0, -1).concat({ points: newSelectedPoints, key: `line_${lines.length}`, color: "black" }));
+              } else {
+                setLines(lines.concat({ points: newSelectedPoints, key: `line_${lines.length + 1}`, color: "black" }));
+              }
+
+              setSelectedPoints(newSelectedPoints);
+              break;
+            case "component":
+              setComponents(components.slice(0, -1).concat({ type: componentType, point: vpos }).concat({ type: componentType, point: vpos }));
+              break;
+            default:
+          }
+        }} onMouseMove={e => {
+          let stage = e.target.getStage();
+          if (!stage) return;
+          let pos = stage.getPointerPosition();
+          if (!pos) return;
+
+          let vpos = toFixedVirtualGrid(pos, pitch, upperLeft);
+          switch (mode) {
+            case "line":
+              if (!selectedPoints.length) break;
+
+              let newSelectedPoints = [...selectedPoints, vpos];
+              setLines(lines.slice(0, -1).concat({ points: newSelectedPoints, key: `line_${lines.length}`, color: "black" }));
+              break;
+            case "component":
+              setComponents(components.slice(0, -1).concat({ type: componentType, point: vpos }));
+              break;
+            default:
+          }
+        }}>
+          <Layer>
+            {VerticalGrids(pitch, width, height, upperLeft.vx)}
+            {HorizontalGrids(pitch, width, height, upperLeft.vy)}
+            {lines.map(l => createLine(l, pitch, upperLeft))}
+            {components.map((c, i) => createComponent(c, pitch, upperLeft, `components_${i}_${c.type}`))}
+          </Layer>
+        </Stage>
+      </div>
+    </React.StrictMode>
   );
 }
 
