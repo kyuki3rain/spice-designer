@@ -24,18 +24,12 @@ type VertexToEdgeIndexMap = {
     }
 }
 
-type LineState = {
-    points: VirtualPoint[];
-    key: string;
-    color: string;
-}
-
 export const useLines = (): [(p: VirtualPoint) => void, (point: VirtualPoint) => void, () => void, (pitch: number, upperLeft: VirtualPoint) => JSX.Element] => {
     const [vertexList, setVertexVertexList] = useState([] as LineVertex[]);
     const [pointMap, setPointMap] = useState({} as PointToVertexIndexMap);
     const [edgeList, setEdgeList] = useState([] as LineEdge[]);
     const [edgeMap, setEdgeMap] = useState({} as VertexToEdgeIndexMap);
-    const [selectedVertexIndex, setSelectedVertexIndex] = useState(NaN as number);
+    const [selectedVertexIndex, setSelectedVertexIndex] = useState(NaN);
     const [previewPoint, setPreviewPoint] = useState({} as VirtualPoint);
 
     const resetSelect = () => {
@@ -54,7 +48,7 @@ export const useLines = (): [(p: VirtualPoint) => void, (point: VirtualPoint) =>
         }
 
         if (!Number.isNaN(selectedVertexIndex)) {
-            let edgeId = edgeList.length;
+            const edgeId = edgeList.length;
             setEdgeList([...edgeList, { id: edgeId, point1: id, point2: selectedVertexIndex }]);
             setEdgeMap({ ...edgeMap, [id]: { ...edgeMap[id], [selectedVertexIndex]: edgeId }, [selectedVertexIndex]: { ...edgeMap[selectedVertexIndex], [id]: edgeId } });
         }
@@ -66,41 +60,40 @@ export const useLines = (): [(p: VirtualPoint) => void, (point: VirtualPoint) =>
         setPreviewPoint(point);
     }
 
-    const createLines = (pitch: number, upperLeft: VirtualPoint) => {
-        let lines = [];
-        for (const e of edgeList) {
-            const point1 = toRealGrid(vertexList[e.point1].point, pitch, upperLeft);
-            const point2 = toRealGrid(vertexList[e.point2].point, pitch, upperLeft);
-            lines.push(<Line
-                key={`line_e${e.id}`}
-                x={0}
-                y={0}
-                points={[point1.x, point1.y, point2.x, point2.y]}
-                stroke={"black"}
-                strokeWidth={2}
-            />);
-        }
-
-        return <Group>
-            {lines}
-            {createPreviewLine(pitch, upperLeft)}
-        </Group>;
-    }
-
     const createPreviewLine = (pitch: number, upperLeft: VirtualPoint) => {
-        if (Number.isNaN(selectedVertexIndex)) return <></>;
+        if (Number.isNaN(selectedVertexIndex)) return null;
 
         const selectedPoint = toRealGrid(vertexList[selectedVertexIndex].point, pitch, upperLeft);
         const previewRealPoint = toRealGrid(previewPoint, pitch, upperLeft);
 
         return <Line
-            key={`line_prev`}
+            key="line_prev"
             x={0}
             y={0}
             points={[selectedPoint.x, selectedPoint.y, previewRealPoint.x, previewRealPoint.y]}
-            stroke={"black"}
+            stroke="black"
             strokeWidth={2}
         />
+    }
+
+    const createLines = (pitch: number, upperLeft: VirtualPoint) => {
+        const lines = edgeList.map(e => {
+            const point1 = toRealGrid(vertexList[e.point1].point, pitch, upperLeft);
+            const point2 = toRealGrid(vertexList[e.point2].point, pitch, upperLeft);
+            return <Line
+                key={`line_e${e.id}`}
+                x={0}
+                y={0}
+                points={[point1.x, point1.y, point2.x, point2.y]}
+                stroke="black"
+                strokeWidth={2}
+            />;
+        });
+
+        return <Group>
+            {lines}
+            {createPreviewLine(pitch, upperLeft)}
+        </Group>;
     }
 
     return [setPoint, setPreview, resetSelect, createLines];
