@@ -19,10 +19,3 @@ export const modeToCursorStyle = (mode: ModeType) => {
       return 'default';
   }
 };
-
-export const textToMode = (mode_text: string) => {
-  const mode = Object.values(Mode).find((value) => value === mode_text);
-  if (!mode) return Mode.ERR;
-
-  return mode;
-};
