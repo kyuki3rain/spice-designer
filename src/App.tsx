@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/tabindex-no-positive */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Stage, Layer } from 'react-konva';
 import './App.css';
 import { ComponentState, ComponentType, ComponentTypes, createComponent, nextType } from './components';
@@ -9,10 +9,12 @@ import { HorizontalGrids, VerticalGrids } from './Grid';
 import { add, RealPoint, sub, toFixedVirtualGrid, toVirtualGrid, VirtualPoint } from './helpers/gridhelper';
 import { useWindowSize } from './hooks/useWindowSize';
 import { useLines } from './hooks/useLines';
+import { Mode, ModeType } from './helpers/modehelper';
+import { usePreviousMode } from './hooks/usePreviousMode';
 
 const modeToCursorStyle = (mode: string) => {
   switch (mode) {
-    case 'line':
+    case Mode.LINE:
       return 'crosshair';
     default:
       return 'default';
@@ -26,8 +28,34 @@ const App: React.FC = () => {
   const [pitch, setPitch] = useState(20);
   const [upperLeft, setUpperLeft] = useState({ vx: 0, vy: 0 } as VirtualPoint);
   const [components, setComponents] = useState([] as ComponentState[]);
-  const [mode, setMode] = useState('none');
+  const [mode, setMode] = useState(Mode.NONE as ModeType);
+  const prevMode = usePreviousMode(mode);
   const [componentType, setComponentType] = useState(ComponentTypes.CELL as ComponentType);
+
+  // mode unmount
+  useEffect(() => {
+    if (prevMode === Mode.LINE) {
+      resetSelect();
+    }
+    if (prevMode === Mode.COMPONENT) {
+      setComponents(components.slice(0, -1));
+    }
+  }, [prevMode]);
+  // mode unmount
+
+  // mode mount
+  useEffect(() => {
+    if (mode === Mode.COMPONENT) {
+      setComponents(
+        components.concat({
+          type: componentType,
+          point: { vx: 0, vy: 0 },
+          key: `components_${components.length + 1}`,
+        })
+      );
+    }
+  }, [mode]);
+  // mode mount
 
   return (
     <React.StrictMode>
@@ -54,27 +82,16 @@ const App: React.FC = () => {
         }}
         tabIndex={1}
         onKeyDown={(e) => {
-          let nextMode = mode;
           switch (e.code) {
             case 'Escape':
-              nextMode = 'none';
+              setMode(Mode.NONE);
               break;
             case 'KeyL':
-              nextMode = 'line';
+              setMode(Mode.LINE);
               break;
             case 'KeyP':
-              nextMode = 'component';
-              if (mode !== nextMode) {
-                setComponents(
-                  components.concat({
-                    type: componentType,
-                    point: { vx: 0, vy: 0 },
-                    key: `components_${components.length + 1}`,
-                  })
-                );
-              } else {
-                setComponentType(nextType(componentType));
-              }
+              if (mode === Mode.COMPONENT) setComponentType(nextType(componentType));
+              else setMode(Mode.COMPONENT);
               break;
             case 'KeyE':
               setPitch(pitch + 1);
@@ -84,13 +101,6 @@ const App: React.FC = () => {
               break;
             default:
           }
-          if (mode === 'line' && nextMode !== mode) {
-            resetSelect();
-          }
-          if (mode === 'component' && nextMode !== mode) {
-            setComponents(components.slice(0, -1));
-          }
-          setMode(nextMode);
         }}
         style={{ cursor: modeToCursorStyle(mode) }}
       >
@@ -105,10 +115,10 @@ const App: React.FC = () => {
 
             const vpos = toFixedVirtualGrid(pos, pitch, upperLeft);
             switch (mode) {
-              case 'line':
+              case Mode.LINE:
                 setPoint(vpos);
                 break;
-              case 'component':
+              case Mode.COMPONENT:
                 setComponents(
                   components
                     .slice(0, -1)
@@ -127,10 +137,10 @@ const App: React.FC = () => {
 
             const vpos = toFixedVirtualGrid(pos, pitch, upperLeft);
             switch (mode) {
-              case 'line':
+              case Mode.LINE:
                 setPreview(vpos);
                 break;
-              case 'component':
+              case Mode.COMPONENT:
                 setComponents(
                   components
                     .slice(0, -1)
