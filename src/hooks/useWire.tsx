@@ -1,7 +1,9 @@
 import { useCallback } from 'react';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import {
+  EdgeId,
   edgeListAtom,
+  NodeId,
   nodeIdToEdgeIdAtom,
   nodeListAtom,
   pointToNodeIdAtom,
@@ -29,13 +31,13 @@ export const useWire = () => {
       let id = pointToNodeIdMap.get(pString);
 
       if (id === undefined) {
-        id = nodeList.length;
+        id = nodeList.length as NodeId;
         setNodeList([...nodeList, { id, point: p }]);
         setPointToNodeIdMap(new Map(pointToNodeIdMap.set(pString, id)));
       }
 
       if (selectedNodeId !== null) {
-        const edgeId = edgeList.length;
+        const edgeId = edgeList.length as EdgeId;
         setEdgeList([...edgeList, { id: edgeId, node1: id, node2: selectedNodeId }]);
         setNodeIdToEdgeIdMap(
           new Map(
