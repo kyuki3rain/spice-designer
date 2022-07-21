@@ -5,8 +5,9 @@ import React, { useEffect } from 'react';
 import { Stage, Layer } from 'react-konva';
 import './App.css';
 import { useRecoilBridgeAcrossReactRoots_UNSTABLE, useRecoilState } from 'recoil';
-import { createSymbol, nextType } from './symbols';
+import { nextType } from './symbols';
 import Grid from './Grid';
+import { Symbol } from './Symbol';
 import { add, RealPoint, sub, toFixedVirtualGrid, toVirtualGrid } from './helpers/gridhelper';
 import { useWindowSize } from './hooks/useWindowSize';
 import { useWire } from './hooks/useWire';
@@ -148,7 +149,7 @@ const DrawArea: React.FC = () => {
           <Layer>
             <Grid />
             <Wire />
-            {symbols.map((c, i) => createSymbol(c, pitch, upperLeft, `symbol_${i}_${c.type}`))}
+            <Symbol />
           </Layer>
         </Bridge>
       </Stage>
