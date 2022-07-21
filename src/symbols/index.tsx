@@ -4,13 +4,13 @@ import Cell from './Cell';
 import Nmos4 from './Nmos4';
 import Pmos4 from './Pmos4';
 
-export type ComponentState = {
+export type SymbolState = {
   type: string;
   point: VirtualPoint;
   key: string;
 };
 
-export const ComponentTypes = {
+export const SymbolTypes = {
   CELL: 'cell',
   SIGNAL: 'signal',
   NMOS4: 'nmos4',
@@ -18,24 +18,24 @@ export const ComponentTypes = {
   ERROR: 'error',
 } as const;
 
-export type ComponentType = typeof ComponentTypes[keyof typeof ComponentTypes];
+export type SymbolType = typeof SymbolTypes[keyof typeof SymbolTypes];
 
-export const nextType = (ct: ComponentType): ComponentType => {
+export const nextType = (ct: SymbolType): SymbolType => {
   switch (ct) {
-    case ComponentTypes.CELL:
-      return ComponentTypes.SIGNAL;
-    case ComponentTypes.SIGNAL:
-      return ComponentTypes.NMOS4;
-    case ComponentTypes.NMOS4:
-      return ComponentTypes.PMOS4;
-    case ComponentTypes.PMOS4:
-      return ComponentTypes.CELL;
+    case SymbolTypes.CELL:
+      return SymbolTypes.SIGNAL;
+    case SymbolTypes.SIGNAL:
+      return SymbolTypes.NMOS4;
+    case SymbolTypes.NMOS4:
+      return SymbolTypes.PMOS4;
+    case SymbolTypes.PMOS4:
+      return SymbolTypes.CELL;
     default:
-      return ComponentTypes.ERROR;
+      return SymbolTypes.ERROR;
   }
 };
 
-export const createComponent = (c: ComponentState, pitch: number, upperLeft: VirtualPoint, key: string) => {
+export const createSymbol = (c: SymbolState, pitch: number, upperLeft: VirtualPoint, key: string) => {
   switch (c.type) {
     case 'cell':
       return <Cell key={key} upperLeft={upperLeft} point={c.point} pitch={pitch} />;

@@ -1,6 +1,6 @@
 export const Mode = {
-  LINE: 'line',
-  COMPONENT: 'component',
+  WIRE: 'wire',
+  SYMBOL: 'symbol',
   HAND: 'hand',
   MOVE: 'move',
   COPY: 'copy',
@@ -13,7 +13,7 @@ export type ModeType = typeof Mode[keyof typeof Mode];
 
 export const modeToCursorStyle = (mode: ModeType) => {
   switch (mode) {
-    case Mode.LINE:
+    case Mode.WIRE:
       return 'crosshair';
     default:
       return 'default';

@@ -1,7 +1,7 @@
 import { atom } from 'recoil';
-import { ComponentState } from '../components';
+import { SymbolState } from '../symbols';
 
-export const componentsAtom = atom({
-  key: 'components',
-  default: [] as ComponentState[],
+export const symbolsAtom = atom({
+  key: 'symbols',
+  default: [] as SymbolState[],
 });

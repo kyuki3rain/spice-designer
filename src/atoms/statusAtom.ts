@@ -1,5 +1,5 @@
 import { atom } from 'recoil';
-import { ComponentType, ComponentTypes } from '../components';
+import { SymbolType, SymbolTypes } from '../symbols';
 import { Mode, ModeType } from '../helpers/modehelper';
 
 export const modeAtom = atom({
@@ -7,7 +7,7 @@ export const modeAtom = atom({
   default: Mode.NONE as ModeType,
 });
 
-export const componentTypeAtom = atom({
-  key: 'componentType',
-  default: ComponentTypes.CELL as ComponentType,
+export const symbolTypeAtom = atom({
+  key: 'symbolType',
+  default: SymbolTypes.CELL as SymbolType,
 });
