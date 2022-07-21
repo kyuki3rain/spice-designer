@@ -4,9 +4,9 @@
 import React, { useEffect } from 'react';
 import { Stage, Layer } from 'react-konva';
 import './App.css';
-import { useRecoilState } from 'recoil';
+import { useRecoilBridgeAcrossReactRoots_UNSTABLE, useRecoilState } from 'recoil';
 import { createComponent, nextType } from './components';
-import { HorizontalGrids, VerticalGrids } from './Grid';
+import Grid from './Grid';
 import { add, RealPoint, sub, toFixedVirtualGrid, toVirtualGrid } from './helpers/gridhelper';
 import { useWindowSize } from './hooks/useWindowSize';
 import { useLines } from './hooks/useLines';
@@ -15,6 +15,8 @@ import { usePreviousMode } from './hooks/usePreviousMode';
 import { componentsAtom, modeAtom, pitchAtom, componentTypeAtom, upperLeftAtom } from './atoms';
 
 const DrawArea: React.FC = () => {
+  const Bridge = useRecoilBridgeAcrossReactRoots_UNSTABLE();
+
   const { height, width } = useWindowSize();
 
   const [setPoint, setPreview, resetSelect, createLines] = useLines();
@@ -143,12 +145,13 @@ const DrawArea: React.FC = () => {
           }
         }}
       >
-        <Layer>
-          {VerticalGrids(pitch, width, height, upperLeft.vx)}
-          {HorizontalGrids(pitch, width, height, upperLeft.vy)}
-          {createLines(pitch, upperLeft)}
-          {components.map((c, i) => createComponent(c, pitch, upperLeft, `components_${i}_${c.type}`))}
-        </Layer>
+        <Bridge>
+          <Layer>
+            <Grid />
+            {createLines(pitch, upperLeft)}
+            {components.map((c, i) => createComponent(c, pitch, upperLeft, `components_${i}_${c.type}`))}
+          </Layer>
+        </Bridge>
       </Stage>
     </div>
   );
