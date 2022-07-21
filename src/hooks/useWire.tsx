@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Group, Line } from 'react-konva';
 import { toRealGrid, VirtualPoint } from '../helpers/gridhelper';
 
-type LineVertex = {
+type WireVertex = {
   id: number;
   point: VirtualPoint;
 };
@@ -12,7 +12,7 @@ type PointToVertexIndexMap = {
     [key: number]: number;
   };
 };
-type LineEdge = {
+type WireEdge = {
   id: number;
   point1: number;
   point2: number;
@@ -24,15 +24,15 @@ type VertexToEdgeIndexMap = {
   };
 };
 
-export const useLines = (): [
+export const useWire = (): [
   (p: VirtualPoint) => void,
   (point: VirtualPoint) => void,
   () => void,
   (pitch: number, upperLeft: VirtualPoint) => JSX.Element
 ] => {
-  const [vertexList, setVertexVertexList] = useState([] as LineVertex[]);
+  const [vertexList, setVertexVertexList] = useState([] as WireVertex[]);
   const [pointMap, setPointMap] = useState({} as PointToVertexIndexMap);
-  const [edgeList, setEdgeList] = useState([] as LineEdge[]);
+  const [edgeList, setEdgeList] = useState([] as WireEdge[]);
   const [edgeMap, setEdgeMap] = useState({} as VertexToEdgeIndexMap);
   const [selectedVertexIndex, setSelectedVertexIndex] = useState(NaN);
   const [previewPoint, setPreviewPoint] = useState({} as VirtualPoint);
@@ -69,7 +69,7 @@ export const useLines = (): [
     setPreviewPoint(point);
   };
 
-  const createPreviewLine = (pitch: number, upperLeft: VirtualPoint) => {
+  const createPreviewWire = (pitch: number, upperLeft: VirtualPoint) => {
     if (Number.isNaN(selectedVertexIndex)) return null;
 
     const selectedPoint = toRealGrid(vertexList[selectedVertexIndex].point, pitch, upperLeft);
@@ -77,7 +77,7 @@ export const useLines = (): [
 
     return (
       <Line
-        key="line_prev"
+        key="prev_wire"
         x={0}
         y={0}
         points={[selectedPoint.x, selectedPoint.y, previewRealPoint.x, previewRealPoint.y]}
@@ -87,13 +87,13 @@ export const useLines = (): [
     );
   };
 
-  const createLines = (pitch: number, upperLeft: VirtualPoint) => {
-    const lines = edgeList.map((e) => {
+  const createWires = (pitch: number, upperLeft: VirtualPoint) => {
+    const wires = edgeList.map((e) => {
       const point1 = toRealGrid(vertexList[e.point1].point, pitch, upperLeft);
       const point2 = toRealGrid(vertexList[e.point2].point, pitch, upperLeft);
       return (
         <Line
-          key={`line_e${e.id}`}
+          key={`wire_e${e.id}`}
           x={0}
           y={0}
           points={[point1.x, point1.y, point2.x, point2.y]}
@@ -105,13 +105,13 @@ export const useLines = (): [
 
     return (
       <Group>
-        {lines}
-        {createPreviewLine(pitch, upperLeft)}
+        {wires}
+        {createPreviewWire(pitch, upperLeft)}
       </Group>
     );
   };
 
-  return [setPoint, setPreview, resetSelect, createLines];
+  return [setPoint, setPreview, resetSelect, createWires];
 };
 
-export default useLines;
+export default useWire;

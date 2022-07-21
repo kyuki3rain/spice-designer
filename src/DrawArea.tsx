@@ -5,47 +5,47 @@ import React, { useEffect } from 'react';
 import { Stage, Layer } from 'react-konva';
 import './App.css';
 import { useRecoilBridgeAcrossReactRoots_UNSTABLE, useRecoilState } from 'recoil';
-import { createComponent, nextType } from './components';
+import { createSymbol, nextType } from './symbols';
 import Grid from './Grid';
 import { add, RealPoint, sub, toFixedVirtualGrid, toVirtualGrid } from './helpers/gridhelper';
 import { useWindowSize } from './hooks/useWindowSize';
-import { useLines } from './hooks/useLines';
+import { useWire } from './hooks/useWire';
 import { Mode, modeToCursorStyle } from './helpers/modehelper';
 import { usePreviousMode } from './hooks/usePreviousMode';
-import { componentsAtom, modeAtom, pitchAtom, componentTypeAtom, upperLeftAtom } from './atoms';
+import { symbolsAtom, modeAtom, pitchAtom, symbolTypeAtom, upperLeftAtom } from './atoms';
 
 const DrawArea: React.FC = () => {
   const Bridge = useRecoilBridgeAcrossReactRoots_UNSTABLE();
 
   const { height, width } = useWindowSize();
 
-  const [setPoint, setPreview, resetSelect, createLines] = useLines();
+  const [setPoint, setPreview, resetSelect, createWires] = useWire();
   const [pitch, setPitch] = useRecoilState(pitchAtom);
   const [upperLeft, setUpperLeft] = useRecoilState(upperLeftAtom);
-  const [components, setComponents] = useRecoilState(componentsAtom);
+  const [symbols, setSymbols] = useRecoilState(symbolsAtom);
   const [mode, setMode] = useRecoilState(modeAtom);
   const prevMode = usePreviousMode(mode);
-  const [componentType, setComponentType] = useRecoilState(componentTypeAtom);
+  const [symbolType, setSymbolType] = useRecoilState(symbolTypeAtom);
 
   // mode unmount
   useEffect(() => {
-    if (prevMode === Mode.LINE) {
+    if (prevMode === Mode.WIRE) {
       resetSelect();
     }
-    if (prevMode === Mode.COMPONENT) {
-      setComponents(components.slice(0, -1));
+    if (prevMode === Mode.SYMBOL) {
+      setSymbols(symbols.slice(0, -1));
     }
   }, [mode]);
   // mode unmount
 
   // mode mount
   useEffect(() => {
-    if (mode === Mode.COMPONENT) {
-      setComponents(
-        components.concat({
-          type: componentType,
+    if (mode === Mode.SYMBOL) {
+      setSymbols(
+        symbols.concat({
+          type: symbolType,
           point: { vx: 0, vy: 0 },
-          key: `components_${components.length + 1}`,
+          key: `symbol_${symbols.length + 1}`,
         })
       );
     }
@@ -81,11 +81,11 @@ const DrawArea: React.FC = () => {
             setMode(Mode.NONE);
             break;
           case 'KeyL':
-            setMode(Mode.LINE);
+            setMode(Mode.WIRE);
             break;
           case 'KeyP':
-            if (mode === Mode.COMPONENT) setComponentType(nextType(componentType));
-            else setMode(Mode.COMPONENT);
+            if (mode === Mode.SYMBOL) setSymbolType(nextType(symbolType));
+            else setMode(Mode.SYMBOL);
             break;
           case 'KeyE':
             setPitch(pitch + 1);
@@ -109,15 +109,15 @@ const DrawArea: React.FC = () => {
 
           const vpos = toFixedVirtualGrid(pos, pitch, upperLeft);
           switch (mode) {
-            case Mode.LINE:
+            case Mode.WIRE:
               setPoint(vpos);
               break;
-            case Mode.COMPONENT:
-              setComponents(
-                components
+            case Mode.SYMBOL:
+              setSymbols(
+                symbols
                   .slice(0, -1)
-                  .concat({ type: componentType, point: vpos, key: `components_${components.length}` })
-                  .concat({ type: componentType, point: vpos, key: `components_${components.length + 1}` })
+                  .concat({ type: symbolType, point: vpos, key: `symbol_${symbols.length}` })
+                  .concat({ type: symbolType, point: vpos, key: `symbol_${symbols.length + 1}` })
               );
               break;
             default:
@@ -131,14 +131,12 @@ const DrawArea: React.FC = () => {
 
           const vpos = toFixedVirtualGrid(pos, pitch, upperLeft);
           switch (mode) {
-            case Mode.LINE:
+            case Mode.WIRE:
               setPreview(vpos);
               break;
-            case Mode.COMPONENT:
-              setComponents(
-                components
-                  .slice(0, -1)
-                  .concat({ type: componentType, point: vpos, key: `components_${components.length}` })
+            case Mode.SYMBOL:
+              setSymbols(
+                symbols.slice(0, -1).concat({ type: symbolType, point: vpos, key: `symbol_${symbols.length}` })
               );
               break;
             default:
@@ -148,8 +146,8 @@ const DrawArea: React.FC = () => {
         <Bridge>
           <Layer>
             <Grid />
-            {createLines(pitch, upperLeft)}
-            {components.map((c, i) => createComponent(c, pitch, upperLeft, `components_${i}_${c.type}`))}
+            {createWires(pitch, upperLeft)}
+            {symbols.map((c, i) => createSymbol(c, pitch, upperLeft, `symbol_${i}_${c.type}`))}
           </Layer>
         </Bridge>
       </Stage>
