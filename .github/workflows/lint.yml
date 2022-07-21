@@ -12,9 +12,9 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run lint:tsc
+          cache: 'yarn'
+      - run: yarn install --immutable --immutable-cache --check-cache
+      - run: yarn lint:tsc
   ESLint:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -23,9 +23,9 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run lint:eslint
+          cache: 'yarn'
+      - run: yarn install --immutable --immutable-cache --check-cache
+      - run: yarn lint:eslint
   Prettier:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -34,6 +34,6 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run lint:prettier
+          cache: 'yarn'
+      - run: yarn install --immutable --immutable-cache --check-cache
+      - run: yarn lint:prettier
