@@ -40,7 +40,7 @@ const App: React.FC = () => {
     if (prevMode === Mode.COMPONENT) {
       setComponents(components.slice(0, -1));
     }
-  }, [prevMode]);
+  }, [mode]);
   // mode unmount
 
   // mode mount
