@@ -13,13 +13,14 @@ import { useWire } from './hooks/useWire';
 import { Mode, modeToCursorStyle } from './helpers/modehelper';
 import { usePreviousMode } from './hooks/usePreviousMode';
 import { symbolsAtom, modeAtom, pitchAtom, symbolTypeAtom, upperLeftAtom } from './atoms';
+import Wire from './Wire';
 
 const DrawArea: React.FC = () => {
   const Bridge = useRecoilBridgeAcrossReactRoots_UNSTABLE();
 
   const { height, width } = useWindowSize();
 
-  const [setPoint, setPreview, resetSelect, createWires] = useWire();
+  const { setPoint, setPreview, resetSelect } = useWire();
   const [pitch, setPitch] = useRecoilState(pitchAtom);
   const [upperLeft, setUpperLeft] = useRecoilState(upperLeftAtom);
   const [symbols, setSymbols] = useRecoilState(symbolsAtom);
@@ -146,7 +147,7 @@ const DrawArea: React.FC = () => {
         <Bridge>
           <Layer>
             <Grid />
-            {createWires(pitch, upperLeft)}
+            <Wire />
             {symbols.map((c, i) => createSymbol(c, pitch, upperLeft, `symbol_${i}_${c.type}`))}
           </Layer>
         </Bridge>

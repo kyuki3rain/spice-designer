@@ -1,3 +1,4 @@
 export * from './gridAtom';
-export * from './objectAtom';
+export * from './symbolAtom';
+export * from './wireAtom';
 export * from './statusAtom';
