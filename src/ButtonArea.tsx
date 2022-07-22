@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { Fab } from '@mui/material';
+import { Fab, Tooltip } from '@mui/material';
 import React from 'react';
 import { useRecoilCallback, useSetRecoilState } from 'recoil';
 import { Add, Description, HorizontalRule } from '@mui/icons-material';
@@ -21,21 +21,27 @@ const ButtonArea: React.FC = () => {
 
   return (
     <div style={{ float: 'left' }}>
-      <Fab aria-label="wire" onClick={() => setMode(Mode.WIRE)}>
-        <HorizontalRule />
-      </Fab>
-      <Fab
-        aria-label="symbol"
-        color="primary"
-        onClick={() => {
-          setMode(Mode.SYMBOL);
-        }}
-      >
-        <Add />
-      </Fab>
-      <Fab color="primary" aria-label="get log" onClick={showInfo}>
-        <Description />
-      </Fab>
+      <Tooltip title="wire">
+        <Fab aria-label="wire" onClick={() => setMode(Mode.WIRE)}>
+          <HorizontalRule />
+        </Fab>
+      </Tooltip>
+      <Tooltip title="symbol">
+        <Fab
+          aria-label="symbol"
+          color="primary"
+          onClick={() => {
+            setMode(Mode.SYMBOL);
+          }}
+        >
+          <Add />
+        </Fab>
+      </Tooltip>
+      <Tooltip title="console log">
+        <Fab color="primary" aria-label="get log" onClick={showInfo}>
+          <Description />
+        </Fab>
+      </Tooltip>
     </div>
   );
 };
