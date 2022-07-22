@@ -1,14 +1,12 @@
 import React from 'react';
 import './App.css';
 import { RecoilRoot } from 'recoil';
-import DrawArea from './DrawArea';
-import ButtonArea from './ButtonArea';
+import Main from './Main';
 
 const App: React.FC = () => (
   <React.StrictMode>
     <RecoilRoot>
-      <ButtonArea />
-      <DrawArea />
+      <Main />
     </RecoilRoot>
   </React.StrictMode>
 );
