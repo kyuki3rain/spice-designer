@@ -20,7 +20,7 @@ const DrawArea: React.FC = () => {
 
   const { height, width } = useWindowSize();
 
-  const { setPoint, setPreview, resetSelect } = useWire();
+  const { setWire, setPreview, resetSelect } = useWire();
   const [pitch] = useRecoilState(pitchAtom);
   const [upperLeft] = useRecoilState(upperLeftAtom);
   const [symbols, setSymbols] = useRecoilState(symbolsAtom);
@@ -66,7 +66,7 @@ const DrawArea: React.FC = () => {
         const vpos = toFixedVirtualGrid(pos, pitch, upperLeft);
         switch (mode) {
           case Mode.WIRE:
-            setPoint(vpos);
+            setWire(vpos);
             break;
           case Mode.SYMBOL:
             setSymbols(
