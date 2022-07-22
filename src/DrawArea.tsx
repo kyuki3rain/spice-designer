@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/tabindex-no-positive */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Stage, Layer } from 'react-konva';
 import './App.css';
 import { useRecoilBridgeAcrossReactRoots_UNSTABLE, useRecoilState } from 'recoil';
@@ -54,28 +54,41 @@ const DrawArea: React.FC = () => {
   }, [mode]);
   // mode mount
 
+  const divref = useRef<HTMLDivElement>(null);
+
+  const onWheel = (e: WheelEvent) => {
+    e.preventDefault();
+
+    if (e.ctrlKey) {
+      const pos: RealPoint = { x: e.clientX, y: e.clientY };
+      const rawVPos = toVirtualGrid(pos, pitch, upperLeft);
+
+      let newPitch = pitch;
+      if (e.deltaY < 0) newPitch += 1; // Zoom in
+      else newPitch -= 1; // Zoom out
+
+      newPitch = Math.min(Math.max(5, newPitch), 50);
+      const newRawVPos = toVirtualGrid(pos, newPitch, upperLeft);
+
+      setPitch(newPitch);
+      setUpperLeft(add(upperLeft, sub(rawVPos, newRawVPos)));
+    } else {
+      setUpperLeft(add(upperLeft, toVirtualGrid({ x: e.deltaX, y: e.deltaY }, pitch, { vx: 0, vy: 0 })));
+    }
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    divref.current?.addEventListener('wheel', onWheel, { passive: false });
+    return () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      divref.current?.removeEventListener('wheel', onWheel);
+    };
+  });
+
   return (
     <div
-      onWheel={(e) => {
-        e.preventDefault();
-
-        if (e.ctrlKey) {
-          const pos: RealPoint = { x: e.clientX, y: e.clientY };
-          const rawVPos = toVirtualGrid(pos, pitch, upperLeft);
-
-          let newPitch = pitch;
-          if (e.deltaY < 0) newPitch += 1; // Zoom in
-          else newPitch -= 1; // Zoom out
-
-          newPitch = Math.min(Math.max(5, newPitch), 50);
-          const newRawVPos = toVirtualGrid(pos, newPitch, upperLeft);
-
-          setPitch(newPitch);
-          setUpperLeft(add(upperLeft, sub(rawVPos, newRawVPos)));
-        } else {
-          setUpperLeft(add(upperLeft, toVirtualGrid({ x: e.deltaX, y: e.deltaY }, pitch, { vx: 0, vy: 0 })));
-        }
-      }}
+      ref={divref}
       tabIndex={1}
       onKeyDown={(e) => {
         switch (e.code) {
