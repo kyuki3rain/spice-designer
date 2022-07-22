@@ -13,6 +13,7 @@ import { useWire } from './hooks/useWire';
 import { Mode } from './helpers/modehelper';
 import { symbolsAtom, modeAtom, pitchAtom, symbolTypeAtom, upperLeftAtom } from './atoms';
 import Wire from './Wire';
+import { useSymbol } from './hooks/useSymbol';
 
 const DrawArea: React.FC = () => {
   const Bridge = useRecoilBridgeAcrossReactRoots_UNSTABLE();
@@ -20,6 +21,7 @@ const DrawArea: React.FC = () => {
   const { height, width } = useWindowSize();
 
   const { setWire } = useWire();
+  const { setSymbol } = useSymbol();
   const [pitch] = useRecoilState(pitchAtom);
   const [upperLeft] = useRecoilState(upperLeftAtom);
   const [symbols, setSymbols] = useRecoilState(symbolsAtom);
@@ -42,12 +44,7 @@ const DrawArea: React.FC = () => {
             setWire(vpos);
             break;
           case Mode.SYMBOL:
-            setSymbols(
-              symbols
-                .slice(0, -1)
-                .concat({ type: symbolType, point: vpos, key: `symbol_${symbols.length}` })
-                .concat({ type: symbolType, point: vpos, key: `symbol_${symbols.length + 1}` })
-            );
+            setSymbol(vpos);
             break;
           default:
         }

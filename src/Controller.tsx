@@ -7,9 +7,10 @@ import { useRecoilState } from 'recoil';
 import { nextType } from './symbols';
 import { add, RealPoint, sub, toFixedVirtualGrid, toVirtualGrid } from './helpers/gridhelper';
 import { Mode, modeToCursorStyle } from './helpers/modehelper';
-import { modeAtom, pitchAtom, symbolsAtom, symbolTypeAtom, upperLeftAtom } from './atoms';
+import { modeAtom, pitchAtom, symbolTypeAtom, upperLeftAtom } from './atoms';
 import { useWire } from './hooks/useWire';
 import { usePrevious } from './hooks/usePrevious';
+import { useSymbol } from './hooks/useSymbol';
 
 type Props = {
   children: React.ReactNode;
@@ -20,8 +21,8 @@ const Controller: React.FC<Props> = ({ children }) => {
   const [upperLeft, setUpperLeft] = useRecoilState(upperLeftAtom);
   const [mode, setMode] = useRecoilState(modeAtom);
   const [symbolType, setSymbolType] = useRecoilState(symbolTypeAtom);
-  const { setPreview, resetSelect } = useWire();
-  const [symbols, setSymbols] = useRecoilState(symbolsAtom);
+  const { setPreview: setPreviewWire, resetSelect } = useWire();
+  const { setPreview: setPreviewSymbol, resetPreview } = useSymbol();
   const prevMode = usePrevious(mode);
 
   const divref = useRef<HTMLDivElement>(null);
@@ -61,7 +62,7 @@ const Controller: React.FC<Props> = ({ children }) => {
       resetSelect();
     }
     if (prevMode === Mode.SYMBOL) {
-      setSymbols(symbols.slice(0, -1));
+      resetPreview();
     }
   }, [mode]);
   // mode unmount
@@ -69,13 +70,7 @@ const Controller: React.FC<Props> = ({ children }) => {
   // mode mount
   useEffect(() => {
     if (mode === Mode.SYMBOL) {
-      setSymbols(
-        symbols.concat({
-          type: symbolType,
-          point: { vx: 0, vy: 0 },
-          key: `symbol_${symbols.length + 1}`,
-        })
-      );
+      setPreviewSymbol({ vx: 0, vy: 0 });
     }
   }, [mode]);
   // mode mount
@@ -111,10 +106,10 @@ const Controller: React.FC<Props> = ({ children }) => {
 
         switch (mode) {
           case Mode.WIRE:
-            setPreview(vpos);
+            setPreviewWire(vpos);
             break;
           case Mode.SYMBOL:
-            setSymbols(symbols.slice(0, -1).concat({ type: symbolType, point: vpos, key: `symbol_${symbols.length}` }));
+            setPreviewSymbol(vpos);
             break;
           default:
         }
