@@ -15,22 +15,28 @@ const Wire: React.FC = () => {
   const selectedNodeId = useRecoilValue(selectedNodeIdAtom);
   const previewPoint = useRecoilValue(previewPointAtom);
 
+  const selectedNode = selectedNodeId && nodeList.get(selectedNodeId);
+
   return (
     <Group>
-      {edgeList.map((e) =>
-        createLine(
-          toRealGrid(nodeList[e.node1].point, pitch, upperLeft),
-          toRealGrid(nodeList[e.node2].point, pitch, upperLeft),
-          `wire_e${e.id}`
-        )
-      )}
-      {selectedNodeId === null
-        ? null
-        : createLine(
-            toRealGrid(nodeList[selectedNodeId].point, pitch, upperLeft),
+      {Array.from(edgeList).map(([id, edge]) => {
+        const node1 = nodeList.get(edge.node1);
+        const node2 = nodeList.get(edge.node2);
+        if (!node1 || !node2) return null;
+
+        return createLine(
+          toRealGrid(node1.point, pitch, upperLeft),
+          toRealGrid(node2.point, pitch, upperLeft),
+          `wire_${id}`
+        );
+      })}
+      {selectedNode
+        ? createLine(
+            toRealGrid(selectedNode.point, pitch, upperLeft),
             toRealGrid(previewPoint, pitch, upperLeft),
             'prev_wire'
-          )}
+          )
+        : null}
     </Group>
   );
 };
