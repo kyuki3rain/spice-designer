@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useRecoilState } from 'recoil';
 import { NodeId, nodeListAtom, pointToNodeIdAtom } from '../atoms';
+import { getRandomId } from '../helpers/createIdHelper';
 import { VirtualPoint } from '../helpers/gridhelper';
 
 export const useNode = () => {
@@ -8,13 +9,13 @@ export const useNode = () => {
   const [pointToNodeIdMap, setPointToNodeIdMap] = useRecoilState(pointToNodeIdAtom);
 
   const setNode = useCallback(
-    (p: VirtualPoint) => {
-      const pString = JSON.stringify(p);
+    (point: VirtualPoint) => {
+      const pString = JSON.stringify(point);
       let id = pointToNodeIdMap.get(pString);
 
       if (id === undefined) {
-        id = nodeList.length as NodeId;
-        setNodeList([...nodeList, { id, point: p }]);
+        id = getRandomId() as NodeId;
+        setNodeList(nodeList.set(id, { id, point }));
         setPointToNodeIdMap(new Map(pointToNodeIdMap.set(pString, id)));
       }
 

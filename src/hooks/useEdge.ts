@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useRecoilState } from 'recoil';
 import { EdgeId, edgeListAtom, NodeId, nodeIdToEdgeIdAtom } from '../atoms';
+import { getRandomId } from '../helpers/createIdHelper';
 
 export const useEdge = () => {
   const [edgeList, setEdgeList] = useRecoilState(edgeListAtom);
@@ -8,8 +9,8 @@ export const useEdge = () => {
 
   const setEdge = useCallback(
     (node1: NodeId, node2: NodeId) => {
-      const edgeId = edgeList.length as EdgeId;
-      setEdgeList([...edgeList, { id: edgeId, node1, node2 }]);
+      const edgeId = getRandomId() as EdgeId;
+      setEdgeList(edgeList.set(edgeId, { id: edgeId, node1, node2 }));
       setNodeIdToEdgeIdMap(
         new Map(
           nodeIdToEdgeIdMap
