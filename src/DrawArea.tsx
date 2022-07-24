@@ -1,6 +1,3 @@
-/* eslint-disable jsx-a11y/tabindex-no-positive */
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React from 'react';
 import { Stage, Layer } from 'react-konva';
 import './App.css';
