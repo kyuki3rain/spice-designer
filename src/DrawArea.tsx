@@ -11,7 +11,7 @@ import { toFixedVirtualGrid } from './helpers/gridhelper';
 import { useWindowSize } from './hooks/useWindowSize';
 import { useWire } from './hooks/useWire';
 import { Mode } from './helpers/modehelper';
-import { symbolsAtom, modeAtom, pitchAtom, symbolTypeAtom, upperLeftAtom } from './atoms';
+import { modeAtom, pitchAtom, upperLeftAtom } from './atoms';
 import Wire from './Wire';
 import { useSymbol } from './hooks/useSymbol';
 
@@ -24,9 +24,7 @@ const DrawArea: React.FC = () => {
   const { setSymbol } = useSymbol();
   const [pitch] = useRecoilState(pitchAtom);
   const [upperLeft] = useRecoilState(upperLeftAtom);
-  const [symbols, setSymbols] = useRecoilState(symbolsAtom);
   const [mode] = useRecoilState(modeAtom);
-  const [symbolType] = useRecoilState(symbolTypeAtom);
 
   return (
     <Stage
