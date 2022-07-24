@@ -20,7 +20,7 @@ const Controller: React.FC<Props> = ({ children }) => {
   const [upperLeft, setUpperLeft] = useRecoilState(upperLeftAtom);
   const [mode, setMode] = useRecoilState(modeAtom);
   const [symbolType, setSymbolType] = useRecoilState(symbolTypeAtom);
-  const { setPreviewWire, resetPreviewWire, setPreviewSymbol, resetPreviewSymbol } = usePreview();
+  const { setPreview, resetPreview } = usePreview();
   const prevMode = usePrevious(mode);
 
   const divref = useRef<HTMLDivElement>(null);
@@ -54,24 +54,11 @@ const Controller: React.FC<Props> = ({ children }) => {
       divref.current?.removeEventListener('wheel', onWheel);
     };
   });
-  // mode unmount
-  useEffect(() => {
-    if (prevMode === Mode.WIRE) {
-      resetPreviewWire();
-    }
-    if (prevMode === Mode.SYMBOL) {
-      resetPreviewSymbol();
-    }
-  }, [mode]);
-  // mode unmount
 
-  // mode mount
   useEffect(() => {
-    if (mode === Mode.SYMBOL) {
-      setPreviewSymbol({ vx: 0, vy: 0 });
-    }
+    resetPreview(prevMode);
+    setPreview(mode, { vx: 0, vy: 0 });
   }, [mode]);
-  // mode mount
 
   return (
     <div
@@ -102,15 +89,7 @@ const Controller: React.FC<Props> = ({ children }) => {
         const pos: RealPoint = { x: e.clientX, y: e.clientY };
         const vpos = toFixedVirtualGrid(pos, pitch, upperLeft);
 
-        switch (mode) {
-          case Mode.WIRE:
-            setPreviewWire(vpos);
-            break;
-          case Mode.SYMBOL:
-            setPreviewSymbol(vpos);
-            break;
-          default:
-        }
+        setPreview(mode, vpos);
       }}
       style={{ cursor: modeToCursorStyle(mode) }}
     >
