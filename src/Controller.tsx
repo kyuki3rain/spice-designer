@@ -8,9 +8,8 @@ import { nextType } from './symbols';
 import { add, RealPoint, sub, toFixedVirtualGrid, toVirtualGrid } from './helpers/gridhelper';
 import { Mode, modeToCursorStyle } from './helpers/modehelper';
 import { modeAtom, pitchAtom, symbolTypeAtom, upperLeftAtom } from './atoms';
-import { useWire } from './hooks/useWire';
 import { usePrevious } from './hooks/usePrevious';
-import { useSymbol } from './hooks/useSymbol';
+import { usePreview } from './hooks/usePreview';
 
 type Props = {
   children: React.ReactNode;
@@ -21,8 +20,7 @@ const Controller: React.FC<Props> = ({ children }) => {
   const [upperLeft, setUpperLeft] = useRecoilState(upperLeftAtom);
   const [mode, setMode] = useRecoilState(modeAtom);
   const [symbolType, setSymbolType] = useRecoilState(symbolTypeAtom);
-  const { setPreview: setPreviewWire, resetSelect } = useWire();
-  const { setPreview: setPreviewSymbol, resetPreview } = useSymbol();
+  const { setPreviewWire, resetPreviewWire, setPreviewSymbol, resetPreviewSymbol } = usePreview();
   const prevMode = usePrevious(mode);
 
   const divref = useRef<HTMLDivElement>(null);
@@ -59,10 +57,10 @@ const Controller: React.FC<Props> = ({ children }) => {
   // mode unmount
   useEffect(() => {
     if (prevMode === Mode.WIRE) {
-      resetSelect();
+      resetPreviewWire();
     }
     if (prevMode === Mode.SYMBOL) {
-      resetPreview();
+      resetPreviewSymbol();
     }
   }, [mode]);
   // mode unmount
