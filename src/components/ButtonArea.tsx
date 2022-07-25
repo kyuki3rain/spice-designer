@@ -11,8 +11,8 @@ import {
   nodeIdToEdgeIdAtom,
   nodeListAtom,
   pointToNodeIdAtom,
-} from './atoms';
-import { Mode } from './helpers/modehelper';
+} from '../atoms';
+import { Mode } from '../helpers/modehelper';
 
 const ButtonArea: React.FC = () => {
   const setMode = useSetRecoilState(modeSelector);

@@ -1,7 +1,14 @@
 import { Group, Line } from 'react-konva';
 import { useRecoilValue } from 'recoil';
-import { edgeListAtom, nodeListAtom, pitchAtom, previewPointAtom, selectedNodeIdAtom, upperLeftAtom } from './atoms';
-import { RealPoint, toRealGrid } from './helpers/gridhelper';
+import {
+  edgeListAtom,
+  nodeListAtom,
+  pitchAtom,
+  previewPointAtom,
+  selectedNodeIdAtom,
+  upperLeftAtom,
+} from '../../atoms';
+import { RealPoint, toRealGrid } from '../../helpers/gridhelper';
 
 export const createLine = (a: RealPoint, b: RealPoint, key: string) => (
   <Line key={key} x={0} y={0} points={[a.x, a.y, b.x, b.y]} stroke="black" strokeWidth={2} />
