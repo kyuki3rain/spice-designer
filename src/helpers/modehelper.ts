@@ -4,6 +4,7 @@ export const Mode = {
   HAND: 'hand',
   MOVE: 'move',
   COPY: 'copy',
+  LABEL: 'label',
   PARAM: 'param',
   NONE: 'none',
   ERR: 'err',

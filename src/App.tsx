@@ -4,6 +4,7 @@ import { RecoilRoot } from 'recoil';
 import Controller from './Controller';
 import ButtonArea from './ButtonArea';
 import DrawArea from './DrawArea';
+import LabelModal from './LabelModal';
 
 const App: React.FC = () => (
   <React.StrictMode>
@@ -11,6 +12,7 @@ const App: React.FC = () => (
       <Controller>
         <ButtonArea />
         <DrawArea />
+        <LabelModal />
       </Controller>
     </RecoilRoot>
   </React.StrictMode>

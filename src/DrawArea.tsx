@@ -11,6 +11,8 @@ import { Mode } from './helpers/modehelper';
 import { modeAtom, pitchAtom, upperLeftAtom } from './atoms';
 import Wire from './Wire';
 import { useSymbol } from './hooks/useSymbol';
+import { useLabel } from './hooks/useLabel';
+import Label from './Label';
 
 const DrawArea: React.FC = () => {
   const Bridge = useRecoilBridgeAcrossReactRoots_UNSTABLE();
@@ -19,6 +21,7 @@ const DrawArea: React.FC = () => {
 
   const { setWire } = useWire();
   const { setSymbol } = useSymbol();
+  const { setLabel } = useLabel();
   const [pitch] = useRecoilState(pitchAtom);
   const [upperLeft] = useRecoilState(upperLeftAtom);
   const [mode] = useRecoilState(modeAtom);
@@ -41,6 +44,9 @@ const DrawArea: React.FC = () => {
           case Mode.SYMBOL:
             setSymbol(vpos);
             break;
+          case Mode.LABEL:
+            setLabel(vpos);
+            break;
           default:
         }
       }}
@@ -50,6 +56,7 @@ const DrawArea: React.FC = () => {
           <Grid />
           <Wire />
           <Symbol />
+          <Label />
         </Layer>
       </Bridge>
     </Stage>
