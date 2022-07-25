@@ -2,12 +2,21 @@
 import { Fab, Tooltip } from '@mui/material';
 import React from 'react';
 import { useRecoilCallback, useSetRecoilState } from 'recoil';
-import { Add, Description, HorizontalRule } from '@mui/icons-material';
-import { edgeListAtom, modeAtom, modeSelector, nodeIdToEdgeIdAtom, nodeListAtom, pointToNodeIdAtom } from './atoms';
+import { Add, Description, HorizontalRule, Label } from '@mui/icons-material';
+import {
+  edgeListAtom,
+  labelModalAtom,
+  modeAtom,
+  modeSelector,
+  nodeIdToEdgeIdAtom,
+  nodeListAtom,
+  pointToNodeIdAtom,
+} from './atoms';
 import { Mode } from './helpers/modehelper';
 
 const ButtonArea: React.FC = () => {
   const setMode = useSetRecoilState(modeSelector);
+  const setLabelModal = useSetRecoilState(labelModalAtom);
   const showInfo = useRecoilCallback(
     ({ snapshot }) =>
       () => {
@@ -33,14 +42,20 @@ const ButtonArea: React.FC = () => {
         </Fab>
       </Tooltip>
       <Tooltip title="symbol">
+        <Fab aria-label="symbol" color="primary" onClick={() => setMode(Mode.SYMBOL)}>
+          <Add />
+        </Fab>
+      </Tooltip>
+      <Tooltip title="label">
         <Fab
-          aria-label="symbol"
           color="primary"
+          aria-label="add label"
           onClick={() => {
-            setMode(Mode.SYMBOL);
+            setMode(Mode.LABEL);
+            setLabelModal(true);
           }}
         >
-          <Add />
+          <Label />
         </Fab>
       </Tooltip>
       <Tooltip title="console log">
