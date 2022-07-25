@@ -3,7 +3,7 @@ import { Fab, Tooltip } from '@mui/material';
 import React from 'react';
 import { useRecoilCallback, useSetRecoilState } from 'recoil';
 import { Add, Description, HorizontalRule } from '@mui/icons-material';
-import { edgeListAtom, modeAtom, modeSelector, nodeListAtom } from './atoms';
+import { edgeListAtom, modeAtom, modeSelector, nodeIdToEdgeIdAtom, nodeListAtom, pointToNodeIdAtom } from './atoms';
 import { Mode } from './helpers/modehelper';
 
 const ButtonArea: React.FC = () => {
@@ -12,11 +12,15 @@ const ButtonArea: React.FC = () => {
     ({ snapshot }) =>
       () => {
         const nodeList = snapshot.getLoadable(nodeListAtom).getValue();
+        const nodeMap = snapshot.getLoadable(pointToNodeIdAtom).getValue();
         const edgeList = snapshot.getLoadable(edgeListAtom).getValue();
+        const edgeMap = snapshot.getLoadable(nodeIdToEdgeIdAtom).getValue();
         const mode = snapshot.getLoadable(modeAtom).getValue();
         console.log('mode: ', mode);
         console.log('nodeList: ', nodeList);
+        console.log('nodeMap: ', nodeMap);
         console.log('edgeList: ', edgeList);
+        console.log('edgeMap: ', edgeMap);
       },
     []
   );
