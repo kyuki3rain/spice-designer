@@ -1,4 +1,4 @@
-import { Group, Text } from 'react-konva';
+import { Group, Line, Text } from 'react-konva';
 import { useRecoilValue } from 'recoil';
 import {
   nodeIdToLabelAtom,
@@ -8,7 +8,22 @@ import {
   previewLabelPositionAtom,
   upperLeftAtom,
 } from './atoms';
-import { toRealGrid } from './helpers/gridhelper';
+import { RealPoint, toRealGrid } from './helpers/gridhelper';
+
+const createLabel = (rp: RealPoint, label: string, key: string, pitch: number) => {
+  if (label === 'gnd') {
+    return (
+      <Line
+        points={[rp.x + 1 * pitch, rp.y, rp.x - 1 * pitch, rp.y, rp.x, rp.y + 1 * pitch, rp.x + 1 * pitch, rp.y]}
+        stroke="black"
+        strokeWidth={2}
+        key={key}
+      />
+    );
+  }
+
+  return <Text x={rp.x} y={rp.y} fontSize={20} text={label} wrap="char" key={key} />;
+};
 
 const Label: React.FC = () => {
   const nodeIdToLabel = useRecoilValue(nodeIdToLabelAtom);
@@ -27,9 +42,9 @@ const Label: React.FC = () => {
         if (!node) return null;
 
         const rp = toRealGrid(node.point, pitch, upperLeft);
-        return <Text x={rp.x} y={rp.y} fontSize={20} text={label} wrap="char" key={`label_${nodeId}`} />;
+        return createLabel(rp, label, `label_${nodeId}`, pitch);
       })}
-      {prp && <Text x={prp.x} y={prp.y} fontSize={20} text={previewLabelName} wrap="char" />}
+      {prp && createLabel(prp, previewLabelName, `label_preview`, pitch)}
     </Group>
   );
 };
