@@ -35,18 +35,18 @@ const ButtonArea: React.FC = () => {
   );
 
   return (
-    <div style={{ float: 'left' }}>
-      <Tooltip title="wire">
-        <Fab aria-label="wire" onClick={() => setMode(Mode.WIRE)}>
+    <div style={{ float: 'left', marginTop: 5 }}>
+      <Tooltip title="wire" style={{ marginLeft: 5 }}>
+        <Fab aria-label="wire" color="primary" onClick={() => setMode(Mode.WIRE)}>
           <HorizontalRule />
         </Fab>
       </Tooltip>
-      <Tooltip title="symbol">
+      <Tooltip title="symbol" style={{ marginLeft: 10 }}>
         <Fab aria-label="symbol" color="primary" onClick={() => setMode(Mode.SYMBOL)}>
           <Add />
         </Fab>
       </Tooltip>
-      <Tooltip title="label">
+      <Tooltip title="label" style={{ marginLeft: 10 }}>
         <Fab
           color="primary"
           aria-label="add label"
@@ -58,8 +58,8 @@ const ButtonArea: React.FC = () => {
           <Label />
         </Fab>
       </Tooltip>
-      <Tooltip title="console log">
-        <Fab color="primary" aria-label="get log" onClick={showInfo}>
+      <Tooltip title="console log" style={{ marginLeft: 10 }}>
+        <Fab aria-label="get log" onClick={showInfo}>
           <Description />
         </Fab>
       </Tooltip>
