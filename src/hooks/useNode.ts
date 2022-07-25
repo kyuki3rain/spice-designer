@@ -3,25 +3,45 @@ import { useRecoilState } from 'recoil';
 import { NodeId, nodeListAtom, pointToNodeIdAtom } from '../atoms';
 import { getRandomId } from '../helpers/createIdHelper';
 import { VirtualPoint } from '../helpers/gridhelper';
+import { useEdge } from './useEdge';
+
+const isOnEdge = (a: VirtualPoint, b: VirtualPoint, c: VirtualPoint) => {
+  if (a === c || b === c) return true;
+
+  if (b.vx === a.vx) return c.vx === a.vx;
+  if (b.vy === a.vy) return c.vy === a.vy;
+
+  return (c.vx - a.vx) / (b.vx - a.vx) === (c.vy - a.vy) / (b.vy - a.vy);
+};
 
 export const useNode = () => {
   const [nodeList, setNodeList] = useRecoilState(nodeListAtom);
+  const { edgeList, separateEdge } = useEdge();
   const [pointToNodeIdMap, setPointToNodeIdMap] = useRecoilState(pointToNodeIdAtom);
 
   const setNode = useCallback(
     (point: VirtualPoint) => {
       const pString = JSON.stringify(point);
-      let id = pointToNodeIdMap.get(pString);
+      const id = pointToNodeIdMap.get(pString);
+      if (id) return id;
 
-      if (id === undefined) {
-        id = getRandomId() as NodeId;
-        setNodeList(nodeList.set(id, { id, point }));
-        setPointToNodeIdMap(new Map(pointToNodeIdMap.set(pString, id)));
+      const newId = getRandomId() as NodeId;
+      setNodeList(nodeList.set(newId, { id: newId, point }));
+      setPointToNodeIdMap(new Map(pointToNodeIdMap.set(pString, newId)));
+
+      const edge = Array.from(edgeList.values()).find((e) => {
+        const point1 = nodeList.get(e.node1)?.point;
+        const point2 = nodeList.get(e.node2)?.point;
+        if (point1 && point2) return isOnEdge(point1, point2, point);
+        return false;
+      });
+      if (edge) {
+        separateEdge(newId, edge);
       }
 
-      return id;
+      return newId;
     },
-    [nodeList, pointToNodeIdAtom]
+    [nodeList, pointToNodeIdAtom, edgeList]
   );
 
   return { setNode };

@@ -20,7 +20,7 @@ export type WireEdge = {
 
 export type EdgeList = Map<EdgeId, WireEdge>;
 
-export type NodeIdToEdgeIdMap = Map<NodeId, [NodeId, EdgeId][]>;
+export type NodeIdToEdgeIdMap = Map<NodeId, Map<NodeId, EdgeId>>;
 
 export const nodeListAtom = atom({
   key: 'nodeList',
