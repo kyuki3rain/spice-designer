@@ -37,15 +37,46 @@ export const nextType = (ct: SymbolType): SymbolType => {
 
 export const createSymbol = (c: SymbolState, pitch: number, upperLeft: VirtualPoint, key: string) => {
   switch (c.type) {
-    case 'cell':
+    case SymbolTypes.CELL:
       return <Cell key={key} upperLeft={upperLeft} point={c.point} pitch={pitch} />;
-    case 'signal':
+    case SymbolTypes.SIGNAL:
       return <Signal key={key} upperLeft={upperLeft} point={c.point} pitch={pitch} />;
-    case 'nmos4':
+    case SymbolTypes.NMOS4:
       return <Nmos4 key={key} upperLeft={upperLeft} point={c.point} pitch={pitch} />;
-    case 'pmos4':
+    case SymbolTypes.PMOS4:
       return <Pmos4 key={key} upperLeft={upperLeft} point={c.point} pitch={pitch} />;
     default:
       return null;
+  }
+};
+
+export const symbolNodes = (s: SymbolType) => {
+  switch (s) {
+    case SymbolTypes.CELL:
+      return [
+        { vx: 0, vy: 2 },
+        { vx: 0, vy: -2 },
+      ];
+    case SymbolTypes.SIGNAL:
+      return [
+        { vx: 0, vy: -2 },
+        { vx: 0, vy: 3 },
+      ];
+    case SymbolTypes.NMOS4:
+      return [
+        { vx: -1, vy: 2 },
+        { vx: 2, vy: 0 },
+        { vx: 2, vy: -3 },
+        { vx: 2, vy: 3 },
+      ];
+    case SymbolTypes.PMOS4:
+      return [
+        { vx: -1, vy: 2 },
+        { vx: 2, vy: 0 },
+        { vx: 2, vy: -3 },
+        { vx: 2, vy: 3 },
+      ];
+    default:
+      return [];
   }
 };
