@@ -1,7 +1,7 @@
 import { Group } from 'react-konva';
 import { useRecoilValue } from 'recoil';
-import { pitchAtom, previewSymbolAtom, symbolsAtom, upperLeftAtom } from './atoms';
-import { createSymbol } from './symbols';
+import { pitchAtom, previewSymbolAtom, symbolsAtom, upperLeftAtom } from '../../atoms';
+import { createSymbol } from '../../symbols';
 
 export const Symbol: React.FC = () => {
   const pitch = useRecoilValue(pitchAtom);
