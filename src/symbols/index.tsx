@@ -5,7 +5,7 @@ import Nmos4 from './Nmos4';
 import Pmos4 from './Pmos4';
 
 export type SymbolState = {
-  type: string;
+  type: SymbolType;
   point: VirtualPoint;
   key: string;
 };

@@ -12,6 +12,7 @@ import Wire from './drawArea/Wire';
 import { useSymbol } from '../hooks/useSymbol';
 import { useLabel } from '../hooks/useLabel';
 import Label from './drawArea/Label';
+import Node from './drawArea/Node';
 
 const DrawArea: React.FC = () => {
   const Bridge = useRecoilBridgeAcrossReactRoots_UNSTABLE();
@@ -56,6 +57,7 @@ const DrawArea: React.FC = () => {
           <Wire />
           <Symbol />
           <Label />
+          <Node />
         </Layer>
       </Bridge>
     </Stage>
