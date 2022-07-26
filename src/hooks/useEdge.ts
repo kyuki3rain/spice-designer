@@ -13,17 +13,9 @@ export const useEdge = () => {
       setEdgeList(edgeList.set(edgeId, { id: edgeId, node1, node2 }));
 
       setNodeIdToEdgeIdMap(
-        new Map(
-          (map ?? nodeIdToEdgeIdMap)
-            .set(
-              node1,
-              ((map ?? nodeIdToEdgeIdMap).get(node1) ?? (new Map() as Map<NodeId, EdgeId>)).set(node2, edgeId)
-            )
-            .set(
-              node2,
-              ((map ?? nodeIdToEdgeIdMap).get(node2) ?? (new Map() as Map<NodeId, EdgeId>)).set(node1, edgeId)
-            )
-        )
+        (map ?? nodeIdToEdgeIdMap)
+          .set(node1, ((map ?? nodeIdToEdgeIdMap).get(node1) ?? (new Map() as Map<NodeId, EdgeId>)).set(node2, edgeId))
+          .set(node2, ((map ?? nodeIdToEdgeIdMap).get(node2) ?? (new Map() as Map<NodeId, EdgeId>)).set(node1, edgeId))
       );
 
       return edgeId;
@@ -42,19 +34,19 @@ export const useEdge = () => {
       node1List.delete(edge.node2);
       node2List.delete(edge.node1);
 
-      setNodeIdToEdgeIdMap(
-        nodeIdToEdgeIdMap
-          .set(edge.node1, node1List.set(id, edge.id))
-          .set(edge.node2, node2List.set(id, newEdgeId))
-          .set(
-            id,
-            (nodeIdToEdgeIdMap.get(id) ?? (new Map() as Map<NodeId, EdgeId>))
-              .set(edge.node1, edge.id)
-              .set(edge.node2, newEdgeId)
-          )
-      );
+      const map = nodeIdToEdgeIdMap
+        .set(edge.node1, node1List.set(id, edge.id))
+        .set(edge.node2, node2List.set(id, newEdgeId))
+        .set(
+          id,
+          (nodeIdToEdgeIdMap.get(id) ?? (new Map() as Map<NodeId, EdgeId>))
+            .set(edge.node1, edge.id)
+            .set(edge.node2, newEdgeId)
+        );
 
-      return nodeIdToEdgeIdMap;
+      setNodeIdToEdgeIdMap(map);
+
+      return map;
     },
     [edgeList, nodeIdToEdgeIdMap]
   );
