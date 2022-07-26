@@ -27,7 +27,7 @@ export const useNode = () => {
     (point: VirtualPoint) => {
       const pString = JSON.stringify(point);
       const id = pointToNodeIdMap.get(pString);
-      if (id) return id;
+      if (id) return { id };
 
       const newId = getRandomId() as NodeId;
       setNodeList(nodeList.set(newId, { id: newId, point }));
@@ -40,10 +40,11 @@ export const useNode = () => {
         return false;
       });
       if (edge) {
-        separateEdge(newId, edge);
+        const map = separateEdge(newId, edge);
+        return { id: newId, map };
       }
 
-      return newId;
+      return { id: newId };
     },
     [nodeList, pointToNodeIdAtom, edgeList]
   );

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useRecoilState } from 'recoil';
-import { EdgeId, edgeListAtom, NodeId, nodeIdToEdgeIdAtom, WireEdge } from '../atoms';
+import { EdgeId, edgeListAtom, NodeId, nodeIdToEdgeIdAtom, NodeIdToEdgeIdMap, WireEdge } from '../atoms';
 import { getRandomId } from '../helpers/createIdHelper';
 
 export const useEdge = () => {
@@ -8,14 +8,21 @@ export const useEdge = () => {
   const [nodeIdToEdgeIdMap, setNodeIdToEdgeIdMap] = useRecoilState(nodeIdToEdgeIdAtom);
 
   const setEdge = useCallback(
-    (node1: NodeId, node2: NodeId) => {
+    (node1: NodeId, node2: NodeId, map?: NodeIdToEdgeIdMap) => {
       const edgeId = getRandomId() as EdgeId;
       setEdgeList(edgeList.set(edgeId, { id: edgeId, node1, node2 }));
+
       setNodeIdToEdgeIdMap(
         new Map(
-          nodeIdToEdgeIdMap
-            .set(node1, (nodeIdToEdgeIdMap.get(node1) ?? (new Map() as Map<NodeId, EdgeId>)).set(node2, edgeId))
-            .set(node2, (nodeIdToEdgeIdMap.get(node2) ?? (new Map() as Map<NodeId, EdgeId>)).set(node1, edgeId))
+          (map ?? nodeIdToEdgeIdMap)
+            .set(
+              node1,
+              ((map ?? nodeIdToEdgeIdMap).get(node1) ?? (new Map() as Map<NodeId, EdgeId>)).set(node2, edgeId)
+            )
+            .set(
+              node2,
+              ((map ?? nodeIdToEdgeIdMap).get(node2) ?? (new Map() as Map<NodeId, EdgeId>)).set(node1, edgeId)
+            )
         )
       );
 
@@ -30,18 +37,24 @@ export const useEdge = () => {
       const newEdgeId = setEdge(id, edge.node2);
       const node1List = nodeIdToEdgeIdMap.get(edge.node1);
       const node2List = nodeIdToEdgeIdMap.get(edge.node2);
-      if (!node1List || !node2List) return false;
+      if (!node1List || !node2List) return null;
 
       node1List.delete(edge.node2);
       node2List.delete(edge.node1);
 
       setNodeIdToEdgeIdMap(
-        new Map(
-          nodeIdToEdgeIdMap.set(edge.node1, node1List.set(id, edge.id)).set(edge.node2, node2List.set(id, newEdgeId))
-        )
+        nodeIdToEdgeIdMap
+          .set(edge.node1, node1List.set(id, edge.id))
+          .set(edge.node2, node2List.set(id, newEdgeId))
+          .set(
+            id,
+            (nodeIdToEdgeIdMap.get(id) ?? (new Map() as Map<NodeId, EdgeId>))
+              .set(edge.node1, edge.id)
+              .set(edge.node2, newEdgeId)
+          )
       );
 
-      return true;
+      return nodeIdToEdgeIdMap;
     },
     [edgeList, nodeIdToEdgeIdMap]
   );

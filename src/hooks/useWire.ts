@@ -12,10 +12,11 @@ export const useWire = () => {
 
   const setWire = useCallback(
     (point: VirtualPoint) => {
-      const id = setNode(point);
+      const { id, map } = setNode(point);
 
       if (selectedNodeId !== null) {
-        setEdge(id, selectedNodeId);
+        if (map) setEdge(id, selectedNodeId, map);
+        else setEdge(id, selectedNodeId);
       }
 
       setSelectedNodeId(id);
