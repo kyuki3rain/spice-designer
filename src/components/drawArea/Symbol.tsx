@@ -11,7 +11,9 @@ export const Symbol: React.FC = () => {
 
   return (
     <Group>
-      {symbols.map((c, i) => createSymbol(c, pitch, upperLeft, `symbol_${i}_${c.type}`))}
+      {Array.from(symbols.values())
+        .flat()
+        .map((c, i) => createSymbol(c, pitch, upperLeft, `symbol_${i}_${c.type}`))}
       {previewSymbol && createSymbol(previewSymbol, pitch, upperLeft, `symbol_preview`)}
     </Group>
   );

@@ -3,7 +3,7 @@ import { SymbolState } from '../symbols';
 
 export const symbolsAtom = atom({
   key: 'symbols',
-  default: [] as SymbolState[],
+  default: new Map() as Map<string, SymbolState[]>,
 });
 
 export const previewSymbolAtom = atom({
