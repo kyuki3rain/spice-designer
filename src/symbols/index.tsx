@@ -55,8 +55,8 @@ export const symbolNodes = (s: SymbolType) => {
   switch (s) {
     case SymbolTypes.CELL:
       return [
-        { vx: 0, vy: 2 },
         { vx: 0, vy: -2 },
+        { vx: 0, vy: 2 },
       ];
     case SymbolTypes.SIGNAL:
       return [
@@ -65,17 +65,17 @@ export const symbolNodes = (s: SymbolType) => {
       ];
     case SymbolTypes.NMOS4:
       return [
-        { vx: -1, vy: 2 },
-        { vx: 2, vy: 0 },
         { vx: 2, vy: -3 },
+        { vx: -1, vy: 2 },
         { vx: 2, vy: 3 },
+        { vx: 2, vy: 0 },
       ];
     case SymbolTypes.PMOS4:
       return [
-        { vx: -1, vy: 2 },
-        { vx: 2, vy: 0 },
         { vx: 2, vy: -3 },
+        { vx: -1, vy: 2 },
         { vx: 2, vy: 3 },
+        { vx: 2, vy: 0 },
       ];
     default:
       return [];

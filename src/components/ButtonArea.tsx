@@ -13,10 +13,18 @@ import {
   pointToNodeIdAtom,
 } from '../atoms';
 import { Mode } from '../helpers/modehelper';
+import { netListSelector } from '../atoms/netListAtom';
 
 const ButtonArea: React.FC = () => {
   const setMode = useSetRecoilState(modeSelector);
   const setLabelModal = useSetRecoilState(labelModalAtom);
+  const showNetList = useRecoilCallback(
+    ({ snapshot }) =>
+      () => {
+        console.log(snapshot.getLoadable(netListSelector).getValue());
+      },
+    []
+  );
   const showInfo = useRecoilCallback(
     ({ snapshot }) =>
       () => {
@@ -56,6 +64,11 @@ const ButtonArea: React.FC = () => {
           }}
         >
           <Label />
+        </Fab>
+      </Tooltip>
+      <Tooltip title="netlist" style={{ marginLeft: 10 }}>
+        <Fab aria-label="netlist" onClick={showNetList}>
+          <Description />
         </Fab>
       </Tooltip>
       <Tooltip title="console log" style={{ marginLeft: 10 }}>
