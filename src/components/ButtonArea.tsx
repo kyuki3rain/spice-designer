@@ -2,7 +2,7 @@
 import { Fab, Tooltip } from '@mui/material';
 import React from 'react';
 import { useRecoilCallback, useSetRecoilState } from 'recoil';
-import { Add, Description, HorizontalRule, Label } from '@mui/icons-material';
+import { Add, Description, HorizontalRule, Label, Save } from '@mui/icons-material';
 import {
   edgeListAtom,
   labelModalAtom,
@@ -41,11 +41,13 @@ const ButtonArea: React.FC = () => {
         const edgeList = snapshot.getLoadable(edgeListAtom).getValue();
         const edgeMap = snapshot.getLoadable(nodeIdToEdgeIdAtom).getValue();
         const mode = snapshot.getLoadable(modeAtom).getValue();
+        const netlist = snapshot.getLoadable(netListSelector).getValue();
         console.log('mode: ', mode);
         console.log('nodeList: ', nodeList);
         console.log('nodeMap: ', nodeMap);
         console.log('edgeList: ', edgeList);
         console.log('edgeMap: ', edgeMap);
+        console.log(netlist);
       },
     []
   );
@@ -74,9 +76,9 @@ const ButtonArea: React.FC = () => {
           <Label />
         </Fab>
       </Tooltip>
-      <Tooltip title="netlist" style={{ marginLeft: 10 }}>
+      <Tooltip title="save as netlist" style={{ marginLeft: 10 }}>
         <Fab aria-label="netlist" onClick={showNetList}>
-          <Description />
+          <Save />
         </Fab>
       </Tooltip>
       <Tooltip title="console log" style={{ marginLeft: 10 }}>
