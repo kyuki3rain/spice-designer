@@ -2,8 +2,8 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { Button, TextField } from '@mui/material';
-import { labelModalAtom, modeAtom, previewLabelNameAtom } from './atoms';
-import { Mode } from './helpers/modehelper';
+import { labelModalAtom, modeAtom, previewLabelNameAtom } from '../atoms';
+import { Mode } from '../helpers/modehelper';
 
 const style = {
   position: 'absolute' as const,

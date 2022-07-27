@@ -5,9 +5,10 @@ import Nmos4 from './Nmos4';
 import Pmos4 from './Pmos4';
 
 export type SymbolState = {
-  type: string;
+  type: SymbolType;
   point: VirtualPoint;
   key: string;
+  config: string;
 };
 
 export const SymbolTypes = {
@@ -54,8 +55,8 @@ export const symbolNodes = (s: SymbolType) => {
   switch (s) {
     case SymbolTypes.CELL:
       return [
-        { vx: 0, vy: 2 },
         { vx: 0, vy: -2 },
+        { vx: 0, vy: 2 },
       ];
     case SymbolTypes.SIGNAL:
       return [
@@ -64,19 +65,49 @@ export const symbolNodes = (s: SymbolType) => {
       ];
     case SymbolTypes.NMOS4:
       return [
-        { vx: -1, vy: 2 },
-        { vx: 2, vy: 0 },
         { vx: 2, vy: -3 },
+        { vx: -1, vy: 2 },
         { vx: 2, vy: 3 },
+        { vx: 2, vy: 0 },
       ];
     case SymbolTypes.PMOS4:
       return [
-        { vx: -1, vy: 2 },
-        { vx: 2, vy: 0 },
         { vx: 2, vy: -3 },
+        { vx: -1, vy: 2 },
         { vx: 2, vy: 3 },
+        { vx: 2, vy: 0 },
       ];
     default:
       return [];
+  }
+};
+
+export const elementType = (s: SymbolType) => {
+  switch (s) {
+    case SymbolTypes.CELL:
+      return 'V';
+    case SymbolTypes.SIGNAL:
+      return 'V';
+    case SymbolTypes.NMOS4:
+      return 'M';
+    case SymbolTypes.PMOS4:
+      return 'M';
+    default:
+      return '';
+  }
+};
+
+export const defaultConfig = (s: SymbolType) => {
+  switch (s) {
+    case SymbolTypes.CELL:
+      return '1.8';
+    case SymbolTypes.SIGNAL:
+      return 'PULSE(0 1.8 50p 5p 5p 150p 300p)';
+    case SymbolTypes.NMOS4:
+      return 'N l=180n w=1u';
+    case SymbolTypes.PMOS4:
+      return 'P l=180n w=1u';
+    default:
+      return '';
   }
 };

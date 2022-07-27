@@ -1,7 +1,7 @@
 import { Group, Line } from 'react-konva';
 import { useRecoilValue } from 'recoil';
-import { pitchAtom, upperLeftAtom } from './atoms';
-import { useWindowSize } from './hooks/useWindowSize';
+import { pitchAtom, upperLeftAtom } from '../../atoms';
+import { useWindowSize } from '../../hooks/useWindowSize';
 
 const createGrid = (points: number[], key: string) => (
   <Line key={key} x={0} y={0} points={points} stroke="lightgray" strokeWidth={1} />

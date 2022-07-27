@@ -7,8 +7,8 @@ import {
   previewLabelNameAtom,
   previewLabelPositionAtom,
   upperLeftAtom,
-} from './atoms';
-import { RealPoint, toRealGrid } from './helpers/gridhelper';
+} from '../../atoms';
+import { RealPoint, toRealGrid } from '../../helpers/gridhelper';
 
 const createLabel = (rp: RealPoint, label: string, key: string, pitch: number) => {
   if (label === 'gnd') {
