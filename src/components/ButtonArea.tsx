@@ -23,13 +23,24 @@ const ButtonArea: React.FC = () => {
       () => {
         const netlist = snapshot.getLoadable(netListSelector).getValue();
         console.log(netlist);
-        const blob = new Blob([netlist], { type: 'text/plain' });
 
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-
-        link.download = 'test.net';
-        link.click();
+        (async () => {
+          const opts = {
+            suggestedName: 'example',
+            types: [
+              {
+                description: 'Text file',
+                accept: { 'text/plain': ['.net'] },
+              },
+            ],
+          };
+          const handle = await window.showSaveFilePicker(opts);
+          const writable = await handle.createWritable();
+          await writable.write(netlist);
+          await writable.close();
+        })()
+          .then(() => {})
+          .catch(() => {});
       },
     []
   );
