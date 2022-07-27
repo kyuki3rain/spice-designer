@@ -21,7 +21,15 @@ const ButtonArea: React.FC = () => {
   const showNetList = useRecoilCallback(
     ({ snapshot }) =>
       () => {
-        console.log(snapshot.getLoadable(netListSelector).getValue());
+        const netlist = snapshot.getLoadable(netListSelector).getValue();
+        console.log(netlist);
+        const blob = new Blob([netlist], { type: 'text/plain' });
+
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+
+        link.download = 'test.net';
+        link.click();
       },
     []
   );

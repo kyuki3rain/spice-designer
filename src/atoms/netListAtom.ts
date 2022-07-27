@@ -5,6 +5,14 @@ import { nodeIdToLabelAtom } from './labelAtom';
 import { symbolsAtom } from './symbolAtom';
 import { NodeId, nodeIdToEdgeIdAtom, nodeListAtom, pointToNodeIdAtom } from './wireAtom';
 
+// 日付をYYYY-MM-DDの書式で返すメソッド
+function formatDate(dt: Date) {
+  const y = dt.getFullYear();
+  const m = `00${dt.getMonth() + 1}`.slice(-2);
+  const d = `00${dt.getDate()}`.slice(-2);
+  return `${y}-${m}-${d}`;
+}
+
 export const netListSelector = selector({
   key: 'netList',
   get: ({ get }) => {
@@ -43,7 +51,7 @@ export const netListSelector = selector({
       }
     });
 
-    const netList: string[] = [];
+    const netList: string[] = [`* made by spice-designer ${formatDate(new Date())}`];
 
     symbols.forEach((sarr, k) => {
       sarr.every((s, si) => {
