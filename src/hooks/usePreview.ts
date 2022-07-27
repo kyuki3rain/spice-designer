@@ -10,7 +10,7 @@ import {
 } from '../atoms';
 import { VirtualPoint } from '../helpers/gridhelper';
 import { Mode, ModeType } from '../helpers/modehelper';
-import { SymbolTypes } from '../symbols';
+import { defaultConfig, SymbolTypes } from '../symbols';
 
 export const usePreview = () => {
   const setSelectedNodeId = useSetRecoilState(selectedNodeIdAtom);
@@ -46,7 +46,7 @@ export const usePreview = () => {
           setPreviewPoint(point);
           break;
         case Mode.SYMBOL:
-          setPreviewSymbol({ type: symbolType, point, key: `symbol_preview` });
+          setPreviewSymbol({ type: symbolType, point, key: `symbol_preview`, config: defaultConfig(symbolType) });
           break;
         case Mode.LABEL:
           setPreviewLabelPosition(point);
